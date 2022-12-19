@@ -24,15 +24,16 @@ int main()
     render(spheres, lights);
 }
 
+void render(const std::vector<Sphere>& spheres, const std::vector<Light>& lit)
 {
-    std::vector<Vec3f> pixelInfo((w_height * w_width) , Vec3f(0,0,0));
+    std::vector<Vec3f> pixelInfo((w_height * w_width), Vec3f(0, 0, 0));
 
     // Code to populate color in image 
     for (size_t i = 0; i < w_width; ++i)
     {
         for (size_t j = 0; j < w_height; ++j)
         {
-            pixelInfo[i + j * w_width] = Vec3f(j/(float)w_height, i/(float)w_width, 0);
+            pixelInfo[i + j * w_width] = Vec3f(j / (float)w_height, i / (float)w_width, 0);
         }
     }
 
@@ -40,12 +41,13 @@ int main()
     {
         for (size_t j = 0; j < w_height; ++j)
         {
-            float x =  (2 * i / (float)w_width - 1) * (tan(fov / 2.f)) * ((float)w_width / (float)w_height);
+            float x = (2 * i / (float)w_width - 1) * (tan(fov / 2.f)) * ((float)w_width / (float)w_height);
             float y = -(2 * j / (float)w_height - 1) * tan(fov / 2.f);
-            Vec3f dir = Vec3f(x,y,-1).normalize();
+            Vec3f dir = Vec3f(x, y, -1).normalize();
+            pixelInfo[i + j * w_width] = cast_ray(Vec3f(0.f, 0.f, 0.f), dir, spheres, lit);
         }
     }
-    
+
     write_to_file("Raytracer.ppm", pixelInfo, w_width, w_height);
 }
 
@@ -66,6 +68,9 @@ void write_to_file(const char* filename, const std::vector<Vec3f>& pixelInfo, si
     f.close();
 }
 
+Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, const std::vector<Light>& lit) {
+    Vec3f material, hit_pt, N;
+    if (!pixel_depth_check(orig, dir, spheres, material, hit_pt, N)) {
         return Vec3f(0.2f, 0.7f, 0.8f); // background color
     }
     for (size_t i = 0; i < lit.size(); ++i)
@@ -77,13 +82,14 @@ void write_to_file(const char* filename, const std::vector<Vec3f>& pixelInfo, si
     return material;
 }
 
+bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, Vec3f& material, Vec3f& hit_pt, Vec3f& normal)
 {
     float sphere_dist = std::numeric_limits<float>::max();
 
     for (size_t i = 0; i < spheres.size(); ++i)
     {
         float dist{};
-        
+
         if (spheres[i].ray_intersect(orig, dir, dist) && dist < sphere_dist)
         {
             sphere_dist = dist;

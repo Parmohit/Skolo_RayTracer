@@ -7,7 +7,7 @@
 
 #include <cassert>
 
-template<typename T,size_t size>
+template<typename T, size_t size>
 class Vec
 {
 	Vec() {}
@@ -50,7 +50,7 @@ public:
 	}
 
 	// using "return reference" so it can be chained
-	Vec<T,2>& operator=(const Vec<T, 2>& v)
+	Vec<T, 2>& operator=(const Vec<T, 2>& v)
 	{
 		//Vec(v);
 		if (this == &v)
@@ -73,7 +73,7 @@ public:
 
 	T& operator[](int pos)
 	{
-		assert(pos<3 && "Index not available; 0 <= index < 3");
+		assert(pos < 3 && "Index not available; 0 <= index < 3");
 		switch (pos) {
 		case 0: return x;
 		case 1: return y;
@@ -93,7 +93,7 @@ public:
 		}
 	}
 
-	Vec<T,3>& operator=(const Vec<T, 3>& v)
+	Vec<T, 3>& operator=(const Vec<T, 3>& v)
 	{
 		//Vec(v);
 		if (this == &v)
@@ -105,7 +105,7 @@ public:
 	}
 
 	float norm() { return std::sqrtf(x * x + y * y + z * z); }
-	Vec<T,3>& normalize()
+	Vec<T, 3>& normalize()
 	{
 		*this = (*this) * (1 / this->norm());
 		return *this;
@@ -116,7 +116,7 @@ public:
 
 // Vector scaling
 template<typename T, typename U, size_t sz>
-Vec<T,sz> operator*(const Vec<T,sz>& vect, const U& val)
+Vec<T, sz> operator*(const Vec<T, sz>& vect, const U& val)
 {
 	Vec<T, sz> sc_vec;
 	for (size_t i = 0; i < sz; ++i)
@@ -136,7 +136,7 @@ T operator*(const Vec<T, sz>& lhs, const Vec<T, sz>& rhs)
 
 // Vector subtraction
 template<typename T, size_t sz>
-Vec<T, sz> operator-(const Vec<T,sz>& lhs, const Vec<T,sz>& rhs)
+Vec<T, sz> operator-(const Vec<T, sz>& lhs, const Vec<T, sz>& rhs)
 {
 	Vec<T, sz> ret;
 	for (size_t i = 0; i < sz; ++i)
@@ -155,7 +155,7 @@ Vec<T, sz> operator+(const Vec<T, sz>& lhs, const Vec<T, sz>& rhs)
 }
 
 // Vector console output
-template<typename T,size_t sz>
+template<typename T, size_t sz>
 std::ostream& operator <<(const std::ostream& out, const Vec<T, sz>& rhs)
 {
 	for (size_t i = 0; i < sz; ++i)
@@ -165,8 +165,8 @@ std::ostream& operator <<(const std::ostream& out, const Vec<T, sz>& rhs)
 
 #endif
 
-												// C++ GENERAL WISDOM
-	
+// C++ GENERAL WISDOM
+
 // fully specialized template class starts with "template<>"
 // partial template specialization for class starts with "template<int size>" or something like this
 // 
