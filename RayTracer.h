@@ -12,21 +12,40 @@ constexpr auto fov = M_PI / 2;
 class Sphere;
 class Light;
 
+struct Material
+{
+	Vec2f albedo{}; // 0 index store diffuse, 1 index stores specular
+	Vec3f diffuse_color{};
+	float sp_exp{};
+
+	Material() :albedo{ 1,0 } {}
+	Material(const Material& m) :albedo{ m.albedo }, diffuse_color{ m.diffuse_color }, sp_exp{ m.sp_exp } {}
+	Material(const Vec2f& a, const Vec3f& color, const float e) : albedo{ a }, diffuse_color{ color }, sp_exp{ e }{}
+
+	/*Material& operator=(const Material& rhs)
+	{
+		this->albedo = rhs.albedo;
+		this->diffuse_color = rhs.diffuse_color;
+		this->sp_exp = rhs.sp_exp;
+		return *this;
+	}*/
+};
+
 void render(const std::vector<Sphere>& spheres, const std::vector<Light>& lit);
-void write_to_file(const char* filename, const std::vector<Vec3f>& pixelInfo, size_t width, size_t height);
+void write_to_file(const char* filename, std::vector<Vec3f>& pixelInfo, size_t width, size_t height);
 Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, const std::vector<Light>& lit);
-bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, Vec3f& material, Vec3f& hit_pt, Vec3f& normal);
+bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, Material& material, Vec3f& hit_pt, Vec3f& normal);
 
 class Sphere
 {
 public:
 	Vec3f centre{};
 	float radius{};
-	Vec3f material{};
+	Material materiall{};
 
 	Sphere() = delete;
 
-	Sphere(const Vec3f& c, float r, const Vec3f& color) : centre{ c }, radius{ r }, material{ color } {}
+	Sphere(const Vec3f& c, float r, const Material& m) : centre{ c }, radius{ r }, materiall{ m } {}
 
 	// R0	: Starting point of ray
 	// dir	: Direction of ray(unit vector)

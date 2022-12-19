@@ -163,6 +163,14 @@ std::ostream& operator <<(const std::ostream& out, const Vec<T, sz>& rhs)
 	return out;
 }
 
+// Vector reflection 
+Vec3f reflect(const Vec3f& incident, const Vec3f& normal) // NOTE: Both are unit vectors | should be normalised
+{
+	Vec3f ref{};
+	ref = (normal * 2.f) * (incident * normal) - incident;
+	return ref;
+}
+
 #endif
 
 // C++ GENERAL WISDOM
