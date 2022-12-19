@@ -22,6 +22,8 @@ struct Material
 	Material(const Material& m) :albedo{ m.albedo }, diffuse_color{ m.diffuse_color }, sp_exp{ m.sp_exp } {}
 	Material(const Vec2f& a, const Vec3f& color, const float e) : albedo{ a }, diffuse_color{ color }, sp_exp{ e }{}
 
+	// Copy constructor used instead of assignment operator '=' 
+	// [[ DEPRECEATED ]]
 	/*Material& operator=(const Material& rhs)
 	{
 		this->albedo = rhs.albedo;
