@@ -24,7 +24,6 @@ int main()
     render(spheres, lights);
 }
 
-void render(const std::vector<Sphere>& spheres, const std::vector<Light>& lit)
 {
     std::vector<Vec3f> pixelInfo((w_height * w_width) , Vec3f(0,0,0));
 
@@ -44,7 +43,6 @@ void render(const std::vector<Sphere>& spheres, const std::vector<Light>& lit)
             float x =  (2 * i / (float)w_width - 1) * (tan(fov / 2.f)) * ((float)w_width / (float)w_height);
             float y = -(2 * j / (float)w_height - 1) * tan(fov / 2.f);
             Vec3f dir = Vec3f(x,y,-1).normalize();
-            pixelInfo[i + j * w_width] = cast_ray(Vec3f(0.f,0.f,0.f), dir, spheres, lit);
         }
     }
     
@@ -68,9 +66,6 @@ void write_to_file(const char* filename, const std::vector<Vec3f>& pixelInfo, si
     f.close();
 }
 
-Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, const std::vector<Light>& lit) {
-    Vec3f material, hit_pt, N;
-    if (!pixel_depth_check(orig, dir, spheres, material, hit_pt, N)) {
         return Vec3f(0.2f, 0.7f, 0.8f); // background color
     }
     for (size_t i = 0; i < lit.size(); ++i)
@@ -78,11 +73,10 @@ Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& s
         Vec3f light_dir = (lit[i].position - hit_pt).normalize();
         material = material * lit[i].intensity * std::max(0.0f, (light_dir * N));
     }
-   
+
     return material;
 }
 
-bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, Vec3f& material, Vec3f& hit_pt, Vec3f& normal)
 {
     float sphere_dist = std::numeric_limits<float>::max();
 

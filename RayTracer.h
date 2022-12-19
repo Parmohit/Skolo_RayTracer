@@ -12,10 +12,7 @@ constexpr auto fov = M_PI / 2;
 class Sphere;
 class Light;
 
-void render(const std::vector<Sphere>& spheres, const std::vector<Light>& lit);
 void write_to_file(const char* filename, const std::vector<Vec3f>& pixelInfo, size_t width, size_t height);
-Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, const std::vector<Light>& lit);
-bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, Vec3f& material, Vec3f& hit_pt, Vec3f& normal);
 
 class Sphere
 {
