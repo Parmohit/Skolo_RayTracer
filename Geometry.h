@@ -134,6 +134,16 @@ T operator*(const Vec<T, sz>& lhs, const Vec<T, sz>& rhs)
 	return sum;
 }
 
+// Vector negation
+template<typename T,size_t sz>
+Vec<T, sz> operator-(const Vec<T,sz>& opd)
+{
+	Vec<T, sz> ret;
+	for (size_t i = 0; i < sz; ++i)
+		ret[i] = opd[i] * -1;
+	return ret;
+}
+
 // Vector subtraction
 template<typename T, size_t sz>
 Vec<T, sz> operator-(const Vec<T, sz>& lhs, const Vec<T, sz>& rhs)
@@ -167,7 +177,7 @@ std::ostream& operator <<(const std::ostream& out, const Vec<T, sz>& rhs)
 Vec3f reflect(const Vec3f& incident, const Vec3f& normal) // NOTE: Both are unit vectors | should be normalised
 {
 	Vec3f ref{};
-	ref = (normal * 2.f) * (incident * normal) - incident;
+	ref = incident - (normal * 2) * (incident * normal);
 	return ref;
 }
 

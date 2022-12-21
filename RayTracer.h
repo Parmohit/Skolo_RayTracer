@@ -33,10 +33,10 @@ struct Material
 	}*/
 };
 
-void render(const std::vector<Sphere>& spheres, const std::vector<Light>& lit);
-void write_to_file(const char* filename, std::vector<Vec3f>& pixelInfo, size_t width, size_t height);
-Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, const std::vector<Light>& lit);
-bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<Sphere>& spheres, Material& material, Vec3f& hit_pt, Vec3f& normal);
+void render(const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vector<std::unique_ptr<Light>>& lit);
+void write_to_file(const char* filename, std::vector<std::unique_ptr<Vec3f>>& pixelInfo, size_t width, size_t height);
+Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vector<std::unique_ptr<Light>>& lit);
+bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<std::unique_ptr<Sphere>>& spheres, Material& material, Vec3f& hit_pt, Vec3f& normal);
 
 class Sphere
 {
@@ -64,12 +64,11 @@ public:
 		// Find distance from projection to intersetion point
 		float dist = std::sqrtf(radius * radius - d);
 		// Find distance from ray starting point till intersection point
-		double t0 = dist - c_proj;
+		intersection_pt = c_proj - dist;
 
-		if (t0 < 0) t0 = dist + c_proj;
-		if (t0 < 0) return false;
+		if (intersection_pt < 0) intersection_pt = dist + c_proj;
+		if (intersection_pt < 0) return false;
 
-		intersection_pt = t0;
 		return true;
 	}
 };
