@@ -12,14 +12,15 @@ int main()
 {
     // Step1. Write an image to the disk
     std::vector<Material> materials;
-    materials.push_back(Material(Vec2f(0.6f, 0.3f), Vec3f(0.4f, 0.4f, 0.3f), 50.f));
-    materials.push_back(Material(Vec2f(0.9f,0.1f), Vec3f(0.3f, 0.1f, 0.1f), 10.f));
+    materials.push_back(Material(Vec3f(0.6f, 0.1f,0.1f), Vec3f(0.4f, 0.4f, 0.3f), 50.f));
+    materials.push_back(Material(Vec3f(0.9f,0.1f,0.0f), Vec3f(0.3f, 0.1f, 0.1f), 10.f));
+    materials.push_back(Material(Vec3f(0.0f, 10.0f,0.8f), Vec3f(1.0, 1.0, 1.0), 1425.));
 
     std::vector<std::unique_ptr<Sphere>> spheres;
     spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(-3, 0, -16), 2, materials[0])));  // const L-value can be assigned R-value
-    spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(-1.0, -1.5, -12), 2, materials[1])));
+    spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(-1.0, -1.5, -12), 2, materials[2])));
     spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(1.5, -0.5, -18), 3, materials[1])));
-    spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(7, 5, -18), 4, materials[0])));
+    spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(7, 5, -18), 4, materials[2])));
 
     // Step2. Define the position of light;
 
@@ -56,7 +57,7 @@ void render(const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vect
             float x = (2 * i / (float)w_width - 1) * (tan(fov / 2.f)) * (w_width / (float)w_height);
             float y = -(2 * j / (float)w_height - 1) * tan(fov / 2.f);
             Vec3f dir = Vec3f(x, y, -1).normalize();
-            pixelInfo[i + j * w_width] = std::make_unique<Vec3f>(cast_ray(Vec3f(0.f, 0.f, 0.f), dir, spheres, lit));
+            pixelInfo[i + j * w_width] = std::make_unique<Vec3f>(cast_ray(Vec3f(0.f, 0.f, 0.f), dir, spheres, lit,0));
         }
     }
 
@@ -82,18 +83,25 @@ void write_to_file(const char* filename, std::vector<std::unique_ptr<Vec3f>>& pi
     f.close();
 }
 
-Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vector<std::unique_ptr<Light>>& lit) {
+Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vector<std::unique_ptr<Light>>& lit, int depth) {
     Vec3f hit_pt, N;
     Material material{};
-    if (!pixel_depth_check(orig, dir, spheres, material, hit_pt, N)) {
+    if (depth > 5 || !pixel_depth_check(orig, dir, spheres, material, hit_pt, N)) {
         return Vec3f(0.2f, 0.7f, 0.8f); // background color
     }
+
+    // Reflection Recursion
+    Vec3f reflec_dir = reflect(dir, N).normalize();
+    Vec3f reflec_orig = reflec_dir * N < 0 ? hit_pt - N * 1e-3 : hit_pt + N * 1e-3;
+    Vec3f reflec_color = cast_ray(reflec_orig, reflec_dir, spheres, lit, depth+1);
+
     float diffuse_light_intensity{}, specular_light_intensity{};
     for (size_t i = 0; i < lit.size(); ++i)
     {
         Vec3f light_dir = (lit[i]->position - hit_pt).normalize();
         float light_dist = (lit[i]->position - hit_pt).norm();
 
+        // Shadow prediction
         Vec3f shadow_orig = (light_dir * N) < 0 ? hit_pt - N*1e-3  : hit_pt + N*1e-3;
         Vec3f shad_inters_pt, shad_N;
         Material tmpmaterial{};
@@ -103,7 +111,7 @@ Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::uniqu
         diffuse_light_intensity += lit[i]->intensity * std::max(0.0f, (light_dir * N));
         specular_light_intensity += powf(std::max(0.0f, reflect(light_dir, N) * dir), material.sp_exp) * lit[i]->intensity;
     }
-    material.diffuse_color = material.diffuse_color * (diffuse_light_intensity * material.albedo[0] + specular_light_intensity * material.albedo[1]);
+    material.diffuse_color = material.diffuse_color * (diffuse_light_intensity * material.albedo[0] + specular_light_intensity * material.albedo[1]) + reflec_color * material.albedo[2];
     return material.diffuse_color;
 }
 
