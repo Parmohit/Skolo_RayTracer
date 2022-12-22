@@ -12,13 +12,14 @@ int main()
 {
     // Step1. Write an image to the disk
     std::vector<Material> materials;
-    materials.push_back(Material(Vec3f(0.6f, 0.1f,0.1f), Vec3f(0.4f, 0.4f, 0.3f), 50.f));
-    materials.push_back(Material(Vec3f(0.9f,0.1f,0.0f), Vec3f(0.3f, 0.1f, 0.1f), 10.f));
-    materials.push_back(Material(Vec3f(0.0f, 10.0f,0.8f), Vec3f(1.0, 1.0, 1.0), 1425.));
+    materials.push_back(Material(Vec4f(0.6f,0.1f,0.1f,0.0f), Vec3f(0.4f, 0.4f, 0.3f), 50.f, 1.0f));
+    materials.push_back(Material(Vec4f(0.9f,0.1f,0.0f,0.0f), Vec3f(0.3f, 0.1f, 0.1f), 10.f, 1.0f));
+    materials.push_back(Material(Vec4f(0.0f, 10.0f,0.8f, 0.0f), Vec3f(1.0f, 1.0f, 1.0f), 1425.f, 1.0f));
+    materials.push_back(Material(Vec4f(0.0f, 0.5f, 0.1f, 0.8f), Vec3f(0.6f, 0.7f, 0.8f), 125.0f, 1.5f));
 
     std::vector<std::unique_ptr<Sphere>> spheres;
     spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(-3, 0, -16), 2, materials[0])));  // const L-value can be assigned R-value
-    spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(-1.0, -1.5, -12), 2, materials[2])));
+    spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(-1.0, -1.5, -12), 2, materials[3])));
     spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(1.5, -0.5, -18), 3, materials[1])));
     spheres.push_back(std::make_unique<Sphere>(Sphere(Vec3f(7, 5, -18), 4, materials[2])));
 
@@ -93,7 +94,12 @@ Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::uniqu
     // Reflection Recursion
     Vec3f reflec_dir = reflect(dir, N).normalize();
     Vec3f reflec_orig = reflec_dir * N < 0 ? hit_pt - N * 1e-3 : hit_pt + N * 1e-3;
-    Vec3f reflec_color = cast_ray(reflec_orig, reflec_dir, spheres, lit, depth+1);
+    Vec3f reflec_color = cast_ray(reflec_orig, reflec_dir, spheres, lit, depth + 1);
+
+    // Refraction recursion
+    Vec3f refrac_dir = refract(dir, N, material.refractive_index, 1.0f).normalize();
+    Vec3f refr_orig = refrac_dir * N < 0 ? hit_pt - N * 1e-2 : hit_pt + N * 1e-2;
+    Vec3f refrac_color = cast_ray(refr_orig, refrac_dir, spheres, lit, depth+1);
 
     float diffuse_light_intensity{}, specular_light_intensity{};
     for (size_t i = 0; i < lit.size(); ++i)
@@ -111,7 +117,7 @@ Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::uniqu
         diffuse_light_intensity += lit[i]->intensity * std::max(0.0f, (light_dir * N));
         specular_light_intensity += powf(std::max(0.0f, reflect(light_dir, N) * dir), material.sp_exp) * lit[i]->intensity;
     }
-    material.diffuse_color = material.diffuse_color * (diffuse_light_intensity * material.albedo[0] + specular_light_intensity * material.albedo[1]) + reflec_color * material.albedo[2];
+    material.diffuse_color = material.diffuse_color * (diffuse_light_intensity * material.albedo[0] + specular_light_intensity * material.albedo[1]) + reflec_color * material.albedo[2] + refrac_color * material.albedo[3];
     return material.diffuse_color;
 }
 
@@ -132,4 +138,26 @@ bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<st
         }
     }
     return sphere_dist < 1000.f;
+}
+
+Vec3f refract(const Vec3f& I, const Vec3f& N, const float refracted_indx, const float inc_indx)
+{
+    float cosi = -std::max(-1.0f, std::min(1.0f, I * N));
+    Vec3f normal_refr = N;
+    float ref_ind_dest = refracted_indx, ref_ind_incident = inc_indx;
+    if (cosi < 0)
+    {
+        cosi = -cosi;
+        normal_refr = -N;
+        std::swap(ref_ind_dest, ref_ind_incident);
+    }
+
+    float ind_ratio = ref_ind_incident / ref_ind_dest;
+    //check for total internal reflection
+    float d = 1 - ind_ratio * ind_ratio * (1 - cosi * cosi);
+
+    if (d < 0)
+        return Vec3f(1.0f, 0.0f, 0.0f);
+    else
+        return (I * ind_ratio + normal_refr * (ind_ratio * cosi - std::sqrtf(d)));
 }

@@ -14,13 +14,14 @@ class Light;
 
 struct Material
 {
-	Vec3f albedo{}; // 0 index store diffuse, 1 index stores specular
+	Vec4f albedo{}; // 0 index store diffuse, 1 index stores specular
 	Vec3f diffuse_color{};
 	float sp_exp{};
+	float refractive_index{};
 
-	Material() :albedo{ 1,0,0 } {}
-	Material(const Material& m) :albedo{ m.albedo }, diffuse_color{ m.diffuse_color }, sp_exp{ m.sp_exp } {}
-	Material(const Vec3f& a, const Vec3f& color, const float e) : albedo{ a }, diffuse_color{ color }, sp_exp{ e }{}
+	Material() :albedo{ 1.f,0.f,0.f,0.f }, refractive_index {1.0f}{}
+	Material(const Material& m) :albedo{ m.albedo }, diffuse_color{ m.diffuse_color }, sp_exp{ m.sp_exp }, refractive_index{ m.refractive_index }{}
+	Material(const Vec4f& a, const Vec3f& color, const float e, const float r_index) : albedo{ a }, diffuse_color{ color }, sp_exp{ e }, refractive_index{ r_index } {}
 
 	// Copy constructor used instead of assignment operator '=' 
 	// [[ DEPRECEATED ]]
@@ -37,6 +38,7 @@ void render(const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vect
 void write_to_file(const char* filename, std::vector<std::unique_ptr<Vec3f>>& pixelInfo, size_t width, size_t height);
 Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vector<std::unique_ptr<Light>>& lit, int depth=0);
 bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<std::unique_ptr<Sphere>>& spheres, Material& material, Vec3f& hit_pt, Vec3f& normal);
+Vec3f refract(const Vec3f& I, const Vec3f& N, const float refracted_index, const float inc_index = 1);
 
 class Sphere
 {
