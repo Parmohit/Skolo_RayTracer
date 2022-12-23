@@ -55,10 +55,10 @@ void render(const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vect
     {
         for (size_t j = 0; j < w_height; ++j)
         {
-            float x = (2 * i / (float)w_width - 1) * (tan(fov / 2.f)) * (w_width / (float)w_height);
-            float y = -(2 * j / (float)w_height - 1) * tan(fov / 2.f);
-            Vec3f dir = Vec3f(x, y, -1).normalize();
-            pixelInfo[i + j * w_width] = std::make_unique<Vec3f>(cast_ray(Vec3f(0.f, 0.f, 0.f), dir, spheres, lit,0));
+            float x = i - w_width / 2.;  
+            float y = w_height / 2. - j; 
+            float z = -w_height / (2 * tan(fov / 2));
+            pixelInfo[i + j * w_width] = std::make_unique<Vec3f>(cast_ray(Vec3f(0.f, 0.f, 0.f), Vec3f(x, y, z).normalize(), spheres, lit,0));
         }
     }
 
