@@ -4,12 +4,32 @@
 #include <iostream>
 #include <vector>
 #include <fstream>
-
+#include <cmath>
 #include "Geometry.h"
 #include "RayTracer.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+
+int envmap_width, envmap_height;
+std::vector<Vec3f> envmap;
 
 int main()
 {
+    // Step0. Read an image from disk
+    int n = -1;
+    unsigned char* pixmap = stbi_load("envmap.jpg", &envmap_width, &envmap_height, &n, 0);
+    if (!pixmap || 3 != n) {
+        std::cerr << "Error: can not load the environment map" << std::endl;
+        return -1;
+    }
+    envmap = std::vector<Vec3f>(envmap_width * envmap_height);
+    for (int j = envmap_height - 1; j >= 0; j--) {
+        for (int i = 0; i < envmap_width; i++) {
+            envmap[i + j * envmap_width] = Vec3f(pixmap[(i + j * envmap_width) * 3 + 0], pixmap[(i + j * envmap_width) * 3 + 1], pixmap[(i + j * envmap_width) * 3 + 2]) * (1 / 255.);
+        }
+    }
+    stbi_image_free(pixmap);
+
     // Step1. Write an image to the disk
     std::vector<Material> materials;
     materials.push_back(Material(Vec4f(0.6f,0.1f,0.1f,0.0f), Vec3f(0.4f, 0.4f, 0.3f), 50.f, 1.0f));
@@ -25,7 +45,6 @@ int main()
 
     // Step2. Define the position of light;
 
-    // opitmization to unique_ptr
     std::vector<std::unique_ptr<Light>> lights;
     //lights.push_back(std::make_unique<Light>((Light(Vec3f(-25.f, 0.f, -40.f), 30.f))));
     
@@ -56,9 +75,9 @@ void render(const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vect
         for (size_t j = 0; j < w_height; ++j)
         {
             float x = i - w_width / 2.;  
-            float y = w_height / 2. - j; 
+            float y = w_height / 2. - j;
             float z = -w_height / (2 * tan(fov / 2));
-            pixelInfo[i + j * w_width] = std::make_unique<Vec3f>(cast_ray(Vec3f(0.f, 0.f, 0.f), Vec3f(x, y, z).normalize(), spheres, lit,0));
+            pixelInfo[i + j * w_width] = std::make_unique<Vec3f>(cast_ray(Vec3f(0.f, 0.f, 0.f), Vec3f(x, y, z).normalize(), spheres, lit, 0));
         }
     }
 
@@ -88,7 +107,7 @@ Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::uniqu
     Vec3f hit_pt, N;
     Material material{};
     if (depth > 5 || !pixel_depth_check(orig, dir, spheres, material, hit_pt, N)) {
-        return Vec3f(0.2f, 0.7f, 0.8f); // background color
+        return background_color(orig, dir);
     }
 
     // Reflection Recursion
@@ -111,7 +130,7 @@ Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::uniqu
         Vec3f shadow_orig = (light_dir * N) < 0 ? hit_pt - N*1e-3  : hit_pt + N*1e-3;
         Vec3f shad_inters_pt, shad_N;
         Material tmpmaterial{};
-        if (pixel_depth_check(shadow_orig, light_dir, spheres, tmpmaterial, shad_inters_pt, shad_N) && (shad_inters_pt - shadow_orig).norm() < light_dist)
+        if ((light_dir*N < 0)||(pixel_depth_check(shadow_orig, light_dir, spheres, tmpmaterial, shad_inters_pt, shad_N) && (shad_inters_pt - shadow_orig).norm() < light_dist))
             continue;
 
         diffuse_light_intensity += lit[i]->intensity * std::max(0.0f, (light_dir * N));
@@ -137,7 +156,24 @@ bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<st
             normal = (hit_pt - spheres[i]->centre).normalize();
         }
     }
-    return sphere_dist < 1000.f;
+
+    float board_dist = std::numeric_limits<float>::max();
+    if (fabs(dir.y) > 1e-3)
+    {
+        float d = -(orig.y + 4) / dir.y;
+        Vec3f pt = orig + dir * d;
+
+        if (d > 0 && fabs(pt.x) < 10 && pt.z <-10 && pt.z >-30)
+        {
+            board_dist = d;
+            if (board_dist < sphere_dist)
+                normal = Vec3f(0.0f, 1.0f, 0.0f);
+            int ff = int(pt.x) + int(pt.z);
+            material.diffuse_color = (int(pt.x+1000) + int(pt.z)) & 1 ? Vec3f(1, 1, 1) : Vec3f(1, .7, .3);
+        }
+    }
+
+    return std::min(board_dist,sphere_dist) < 1000.f;
 }
 
 Vec3f refract(const Vec3f& I, const Vec3f& N, const float refracted_indx, const float inc_indx)
@@ -160,4 +196,14 @@ Vec3f refract(const Vec3f& I, const Vec3f& N, const float refracted_indx, const 
         return Vec3f(1.0f, 0.0f, 0.0f);
     else
         return (I * ind_ratio + normal_refr * (ind_ratio * cosi - std::sqrtf(d)));
+}
+
+Vec3f background_color(const Vec3f& orig, const Vec3f& dir)
+{
+    int x_raw = std::abs((std::atan2(dir.z, dir.x)/(2*M_PI)) * envmap_width); // 7 * envmap_width / (2 * M_PI)
+    int y_raw = std::abs((std::atan2(dir.z, dir.y) / M_PI) * envmap_height); // +  envmap_height/M_PI
+
+    int x = std::max(0,std::min(x_raw,envmap_width-1));
+    int y = std::max(0, std::min(y_raw, envmap_height - 1));
+    return envmap[x + y * envmap_width];
 }

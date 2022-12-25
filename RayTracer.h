@@ -39,6 +39,7 @@ void write_to_file(const char* filename, std::vector<std::unique_ptr<Vec3f>>& pi
 Vec3f cast_ray(const Vec3f& orig, const Vec3f& dir, const std::vector<std::unique_ptr<Sphere>>& spheres, const std::vector<std::unique_ptr<Light>>& lit, int depth=0);
 bool pixel_depth_check(const Vec3f& orig, const Vec3f& dir, const std::vector<std::unique_ptr<Sphere>>& spheres, Material& material, Vec3f& hit_pt, Vec3f& normal);
 Vec3f refract(const Vec3f& I, const Vec3f& N, const float refracted_index, const float inc_index = 1);
+Vec3f background_color(const Vec3f& orig, const Vec3f& dir);
 
 class Sphere
 {
