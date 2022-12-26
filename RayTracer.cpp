@@ -200,8 +200,11 @@ Vec3f refract(const Vec3f& I, const Vec3f& N, const float refracted_indx, const 
 
 Vec3f background_color(const Vec3f& orig, const Vec3f& dir)
 {
-    int x_raw = std::abs((std::atan2(dir.z, dir.x)/(2*M_PI)) * envmap_width); // 7 * envmap_width / (2 * M_PI)
-    int y_raw = std::abs((std::atan2(dir.z, dir.y) / M_PI) * envmap_height); // +  envmap_height/M_PI
+    // NOTE: for fish eye effect, we can use asin, acos but for straight/plain image use atan2
+    // Also, the reflection using sin and cos are fisheyed, but with atan2, it'll fade to infinity
+
+    int x_raw = std::abs((std::atan2(dir.z, dir.x) / (2 * M_PI)) * envmap_width);   //+ 2 * envmap_width / (2 * M_PI)
+    int y_raw = std::abs((std::atan2(dir.z, dir.y) / M_PI) * envmap_height);        // +  envmap_height/M_PI
 
     int x = std::max(0,std::min(x_raw,envmap_width-1));
     int y = std::max(0, std::min(y_raw, envmap_height - 1));

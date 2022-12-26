@@ -237,18 +237,6 @@ Vec<T, sz> reflect(const Vec<T,sz>& incident, const Vec<T,sz>& normal) // NOTE: 
 	return ref;
 }
 
-//// Vector comparison
-//template<typename T, size_t sz>
-//bool opeartor ==(const Vec<T, sz>& lhs, const Vec<T, sz>& rhs)
-//{
-//	for (size_t i = 0; i < sz; i++)
-//	{
-//		if (lhs[i] == rhs[i])
-//			return false;
-//	}
-//	return true;
-//}
-
 #endif
 
 // C++ GENERAL WISDOM
