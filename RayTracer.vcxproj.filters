@@ -9,13 +9,39 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="imgui">
+      <UniqueIdentifier>{c6f97529-470d-4748-8e27-4b6659786bd9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imgui\DirectX12">
+      <UniqueIdentifier>{810c3ffd-8f6c-4fb5-af92-0f1d54d8dc61}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RayTracer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI_utility\imgui.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI_utility\imgui_demo.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI_utility\imgui_draw.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI_utility\imgui_tables.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI_utility\imgui_widgets.cpp">
+      <Filter>imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI_utility\backends\imgui_impl_dx12.cpp">
+      <Filter>imgui\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGUI_utility\backends\imgui_impl_win32.cpp">
+      <Filter>imgui\DirectX12</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -25,6 +51,24 @@
     </ClInclude>
     <ClInclude Include="RayTracer.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI_utility\imgui_internal.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI_utility\imgui.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI_utility\imconfig.h">
+      <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI_utility\backends\imgui_impl_dx12.h">
+      <Filter>imgui\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI_utility\backends\imgui_impl_win32.h">
+      <Filter>imgui\DirectX12</Filter>
+    </ClInclude>
+    <ClInclude Include="ImGUI_utility\imstb_truetype.h">
+      <Filter>imgui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

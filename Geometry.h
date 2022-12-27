@@ -6,6 +6,8 @@
 /// </summary>
 
 #include <cassert>
+#include <vector>
+#include <ostream>
 
 template<typename T, size_t size>
 class Vec
