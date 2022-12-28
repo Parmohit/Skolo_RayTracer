@@ -31,6 +31,9 @@ namespace rtPrime
         }
         stbi_image_free(pixmap);
 
+        // Rotation factor
+        theta_rotation = (theta_rotation + 1) % INT_MAX;
+
         // Step1. Write an image to the disk
         std::vector<Material> materials;
         materials.push_back(Material(Vec4f(0.6f, 0.1f, 0.1f, 0.0f), Vec3f(0.4f, 0.4f, 0.3f), 50.f, 1.0f));
@@ -206,7 +209,7 @@ namespace rtPrime
         // NOTE: for fish eye effect, we can use asin, acos but for straight/plain image use atan2
         // Also, the reflection using sin and cos are fisheyed, but with atan2, it'll fade to infinity
 
-        int x_raw = std::abs((std::atan2(dir.z, dir.x) / (2 * M_PI)) * envmap_width);   //+ 2 * envmap_width / (2 * M_PI)
+        int x_raw = (int)std::abs((std::atan2(dir.z, dir.x) / (2 * M_PI)) * envmap_width + theta_rotation * 0.05 * envmap_width / (2 * M_PI)) % envmap_width;
         int y_raw = std::abs((std::acos(dir.y) / M_PI) * envmap_height);        // +  envmap_height/M_PI
 
         int x = std::max(0, std::min(x_raw, envmap_width - 1));

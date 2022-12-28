@@ -56,7 +56,7 @@ void CleanupRenderTarget();
 void WaitForLastSubmittedFrame();
 FrameContext* WaitForNextFrameResources();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-void getRTimage(ImDrawList *draw_list,const ImVec2& min, ImVec4& mouse_data);
+void getRTimage(ImDrawList *draw_list,const ImVec2& min, const ImVec2& max, const ImVec2& sizze, ImVec4& mouse_data);
 
 // Main code
 
@@ -159,20 +159,24 @@ int wWinMain(
         //  Show RayTracer window
         if (show_raytracer_window)
         {
-            ImGui::Begin("Just Damn!!", NULL, ImGuiWindowFlags_AlwaysUseWindowPadding);
+            ImGui::Begin("Just Damn!!", NULL, ImGuiWindowFlags_AlwaysAutoResize);
+
+            ImVec2 size(rtPrime::w_width, rtPrime::w_height);
+            ImGui::InvisibleButton("canvas", size);
+            ImVec2 p0 = ImGui::GetItemRectMin();
+            ImVec2 p1 = ImGui::GetItemRectMax();
+
             ImVec4 mouse_data{  io.MousePos.x,
                                 io.MousePos.y,
                                 io.MouseDownDuration[0],
                                 io.MouseDownDuration[1]};
     
-            ImVec2 size(rtPrime::w_width, rtPrime::w_height);
-            ImGui::Text("FPS: %f", ImGui::GetIO().Framerate);
-            ImGui::InvisibleButton("canvas", size);
-            ImVec2 p0 = ImGui::GetItemRectMin();
+            mouse_data.x = (mouse_data.x - p0.x) < 0 ? 0 : (((mouse_data.x - p0.x) > size.x) ? size.x : (mouse_data.x - p0.x));
+            mouse_data.y = (mouse_data.y - p0.y) < 0 ? 0 : (((mouse_data.y - p0.y) > size.y) ? size.y : (mouse_data.y - p0.y));
 
             ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-            getRTimage(draw_list, p0, mouse_data);
+            getRTimage(draw_list, p0, p1,size, mouse_data);
             ImGui::End();
         }
 
@@ -473,20 +477,27 @@ LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     return ::DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-void getRTimage(ImDrawList* draw_list, const ImVec2& min, ImVec4& mouse_data)
+void getRTimage(ImDrawList* draw_list, const ImVec2& min, const ImVec2& max, const ImVec2& sizze, ImVec4& mouse_data)
 {
+
     rtPrime::vec_uptr<Vec3f> pixelImage = rtPrime::raytraced_image();
 
-    float pixelDensity = 0.5f;
-    for (size_t i = 0; i < rtPrime::w_width; ++i)
+    if (pixelImage.size() > 0)
     {
-        for (size_t j = 0; j < rtPrime::w_height; ++j)
-        {
-            draw_list->AddRectFilled(
-                ImVec2(min.x + i - pixelDensity, min.y + j - pixelDensity),
-                ImVec2(min.x + i + pixelDensity, min.y + j + pixelDensity),
-                IM_COL32(255 * (*pixelImage[i+j* rtPrime::w_width])[0], 255 * (*pixelImage[i + j * rtPrime::w_width])[1], 255 * (*pixelImage[i + j * rtPrime::w_width])[2], 255));
+        float diff_x = rtPrime::w_width     / sizze.x;
+        float diff_y = rtPrime::w_height    / sizze.y;
 
+        for (size_t i = 0; i < sizze.x-1; ++i)
+        {
+            for (size_t j = 0; j < sizze.y-1; ++j)
+            {
+                Vec3f pixmap = *pixelImage[i * diff_x + j * diff_y * rtPrime::w_width];
+                draw_list->AddRectFilled(
+                    ImVec2(min.x + i,   min.y + j),
+                    ImVec2(min.x + i + 1.f,   min.y + j + 1.f),
+                    IM_COL32(255 * pixmap[0], 255 * pixmap[1], 255 * pixmap[2], 255));
+
+            }
         }
     }
 }

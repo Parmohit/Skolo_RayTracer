@@ -2,6 +2,7 @@
 #define RAYTRACER_H
 
 #include "Geometry.h"
+#include <limits>
 
 namespace rtPrime
 {
@@ -10,6 +11,8 @@ namespace rtPrime
 	constexpr int w_height = 768;
 	constexpr auto M_PI = 3.14159265358979323846;
 	constexpr auto fov = M_PI / 2;
+
+	static int theta_rotation = -1;
 
 	class Sphere;
 	class Light;
