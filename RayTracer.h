@@ -9,8 +9,7 @@ namespace rtPrime
 	// Don't want to slow down the exection time? use "contexpr"
 	constexpr int w_width = 1024;
 	constexpr int w_height = 768;
-	constexpr auto M_PI = 3.14159265358979323846;
-	constexpr auto fov = M_PI / 2;
+	constexpr auto fov = R_PI / 2;
 
 	static int theta_rotation = -1;
 

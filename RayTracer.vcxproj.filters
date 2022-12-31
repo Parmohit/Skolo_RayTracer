@@ -15,6 +15,9 @@
     <Filter Include="imgui\DirectX12">
       <UniqueIdentifier>{810c3ffd-8f6c-4fb5-af92-0f1d54d8dc61}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Burst_Anim">
+      <UniqueIdentifier>{f85f9bfc-7ae0-485b-aaa8-181c853995fe}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="RayTracer.cpp">
@@ -44,6 +47,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Xplode.cpp">
+      <Filter>Burst_Anim</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h">
@@ -69,6 +75,9 @@
     </ClInclude>
     <ClInclude Include="ImGUI_utility\imstb_truetype.h">
       <Filter>imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="Xplode.h">
+      <Filter>Burst_Anim</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

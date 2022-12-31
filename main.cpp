@@ -13,6 +13,7 @@
 #include <dxgi1_4.h>
 #include <tchar.h>
 #include "RayTracer.h"
+#include "Xplode.h"
 
 #ifdef _DEBUG
 #define DX12_ENABLE_DEBUG_LAYER
@@ -57,6 +58,7 @@ void WaitForLastSubmittedFrame();
 FrameContext* WaitForNextFrameResources();
 LRESULT WINAPI WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 void getRTimage(ImDrawList *draw_list,const ImVec2& min, const ImVec2& max, const ImVec2& sizze, ImVec4& mouse_data);
+void cap_Explosion(ImDrawList* draw_list, const ImVec2& min, const ImVec2& max, const ImVec2& sizze);
 
 // Main code
 
@@ -161,7 +163,7 @@ int wWinMain(
         {
             ImGui::Begin("Just Damn!!", NULL, ImGuiWindowFlags_AlwaysAutoResize);
 
-            ImVec2 size(rtPrime::w_width, rtPrime::w_height);
+            ImVec2 size(Explosion::w_width, Explosion::w_height);
             ImGui::InvisibleButton("canvas", size);
             ImVec2 p0 = ImGui::GetItemRectMin();
             ImVec2 p1 = ImGui::GetItemRectMax();
@@ -176,7 +178,8 @@ int wWinMain(
 
             ImDrawList* draw_list = ImGui::GetWindowDrawList();
 
-            getRTimage(draw_list, p0, p1,size, mouse_data);
+            //getRTimage(draw_list, p0, p1,size, mouse_data); // RAYTRACED EXAMPLE
+            cap_Explosion(draw_list, p0, p1, size);
             ImGui::End();
         }
 
@@ -497,6 +500,26 @@ void getRTimage(ImDrawList* draw_list, const ImVec2& min, const ImVec2& max, con
                     ImVec2(min.x + i + 1.f,   min.y + j + 1.f),
                     IM_COL32(255 * pixmap[0], 255 * pixmap[1], 255 * pixmap[2], 255));
 
+            }
+        }
+    }
+}
+
+void cap_Explosion(ImDrawList* draw_list, const ImVec2& min, const ImVec2& max, const ImVec2& sizze)
+{
+    std::vector<Vec3f> pixelImage = Explosion::start_point();
+
+    if (pixelImage.size() > 0)
+    {
+        for (size_t i = 0; i < sizze.x; ++i)
+        {
+            for (size_t j = 0; j < sizze.y; ++j)
+            {
+                Vec3f color = pixelImage[i + j * Explosion::w_width] * 255;
+                draw_list->AddRectFilled(
+                    ImVec2(min.x + i, min.y + j),
+                    ImVec2(min.x + i + 1, min.y + j + 1),
+                    IM_COL32(color.x, color.y, color.z, 255));
             }
         }
     }

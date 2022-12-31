@@ -162,6 +162,7 @@
     <ClCompile Include="ImGUI_utility\imgui_widgets.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="RayTracer.cpp" />
+    <ClCompile Include="Xplode.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Geometry.h" />
@@ -172,6 +173,7 @@
     <ClInclude Include="ImGUI_utility\imgui_internal.h" />
     <ClInclude Include="ImGUI_utility\imstb_truetype.h" />
     <ClInclude Include="RayTracer.h" />
+    <ClInclude Include="Xplode.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,6 +9,8 @@
 #include <vector>
 #include <ostream>
 
+constexpr auto R_PI = 3.14159265358979323846;
+
 template<typename T, size_t size>
 class Vec
 {
@@ -111,6 +113,7 @@ public:
 	float norm() { return std::sqrtf(x * x + y * y + z * z); }
 	Vec<T, 3>& normalize()
 	{
+		if (this->norm() == 0) return *this * 0;
 		*this = (*this) * (1 / this->norm());
 		return *this;
 	}
@@ -164,6 +167,7 @@ public:
 	float norm() { return std::sqrtf(x * x + y * y + z * z + w * w); }
 	Vec<T, 4>& normalize()
 	{
+		if (this->norm() == 0) return *this * 0;
 		*this = (*this) * (1 / this->norm());
 		return *this;
 	}

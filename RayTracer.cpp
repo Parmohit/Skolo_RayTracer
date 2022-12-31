@@ -209,8 +209,8 @@ namespace rtPrime
         // NOTE: for fish eye effect, we can use asin, acos but for straight/plain image use atan2
         // Also, the reflection using sin and cos are fisheyed, but with atan2, it'll fade to infinity
 
-        int x_raw = (int)std::abs((std::atan2(dir.z, dir.x) / (2 * M_PI)) * envmap_width + theta_rotation * 0.05 * envmap_width / (2 * M_PI)) % envmap_width;
-        int y_raw = std::abs((std::acos(dir.y) / M_PI) * envmap_height);        // +  envmap_height/M_PI
+        int x_raw = (int)std::abs((std::atan2(dir.z, dir.x) / (2 * R_PI)) * envmap_width + theta_rotation * 0.05 * envmap_width / (2 * R_PI)) % envmap_width;
+        int y_raw = std::abs((std::acos(dir.y) / R_PI) * envmap_height);        // +  envmap_height/M_PI
 
         int x = std::max(0, std::min(x_raw, envmap_width - 1));
         int y = std::max(0, std::min(y_raw, envmap_height - 1));
@@ -221,4 +221,4 @@ namespace rtPrime
 
 1. Add a cube to 3d system.
 2. Integrate with imgui to use mouse movement to look around.~ in-progress 
-3. Create a namespace for raytracer*/
+3. Add duck to viewport*/
