@@ -225,6 +225,13 @@ Vec<T, sz> operator+(const Vec<T, sz>& lhs, const Vec<T, sz>& rhs)
 	return ret;
 }
 
+// Vector Dot product
+template<typename T, size_t sz>
+T dot(const Vec<T, sz>& lhs, const Vec<T, sz>& rhs)
+{
+	return lhs.x * rhs.x + lhs.y * rhs.y + lhs.z * rhs.z;
+}
+
 // Vector console output
 template<typename T, size_t sz>
 std::ostream& operator <<(const std::ostream& out, const Vec<T, sz>& rhs)

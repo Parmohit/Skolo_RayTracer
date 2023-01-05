@@ -62,12 +62,13 @@ void cap_Explosion(ImDrawList* draw_list, const ImVec2& min, const ImVec2& max, 
 
 // Main code
 
-int wWinMain(
-    HINSTANCE hInstance,
-    HINSTANCE hPrevInstance,
-    PWSTR lpCmdLine,
-    int nShowCmd
-)
+//int wWinMain(
+//    HINSTANCE hInstance,
+//    HINSTANCE hPrevInstance,
+//    PWSTR lpCmdLine,
+//    int nShowCmd
+//)
+int jj()
 {
     // Create application window
     //ImGui_ImplWin32_EnableDpiAwareness();
